@@ -32,6 +32,13 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
         conexao = ModuloConexao.conector();
     }
     
+    private void limparTela(){
+        txtFuncMatricula.setText(null);
+        txtFuncNome.setText(null);
+        txtFuncMatricula.setText(null);
+        txtFuncTelefone.setText(null);
+    }
+    
     private void consultar(){
         String sql = "SELECT * FROM funcionario WHERE matriculaFuncionario = ?";
         if(!txtFuncMatricula.getText().isEmpty()){
@@ -87,8 +94,8 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
                 }
                 //A linha abaixo atualiza a tabela usuario com os dados do formulário
                 pst.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso!");
-            
+                JOptionPane.showMessageDialog(null, "Funcionário cadastrado com sucesso!");
+                limparTela();
             } catch (Exception e) {
                 if(e.toString().contains("com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Duplicate entry")){
                     JOptionPane.showMessageDialog(null, "Já existe um usuário com esta matrícula ou login!");
@@ -102,6 +109,20 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
         }
         else{
             JOptionPane.showMessageDialog(null, "Todos os campos são obrigatórios!", "Atenção", JOptionPane.OK_OPTION);
+        }
+    }
+    
+    private void deletarFuncionario(){
+        String sql = "DELETE FROM FUNCIONARIO WHERE matriculaFuncionario = ?";
+        try {
+            pst = conexao.prepareStatement(sql);
+            pst.setString(1, txtFuncMatricula.getText());
+            pst.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Funcionário deletado com sucesso!");
+            limparTela();
+            //limparTela();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
         }
     }
 
@@ -133,8 +154,14 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
         setMinimumSize(new java.awt.Dimension(948, 579));
         setPreferredSize(new java.awt.Dimension(948, 579));
 
+        txtFuncMatricula.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtFuncMatriculaKeyTyped(evt);
+            }
+        });
+
         btnPesquisaFunc.setIcon(new javax.swing.ImageIcon(getClass().getResource("/BDI/Digital/Icones/if_file_search_48764.png"))); // NOI18N
-        btnPesquisaFunc.setToolTipText("Cadastrar Cliente");
+        btnPesquisaFunc.setToolTipText("Pesquisar Funcionário");
         btnPesquisaFunc.setBorderPainted(false);
         btnPesquisaFunc.setContentAreaFilled(false);
         btnPesquisaFunc.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -145,7 +172,7 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
         });
 
         btnAlterarFunc.setIcon(new javax.swing.ImageIcon(getClass().getResource("/BDI/Digital/Icones/if_file_edit_48763.png"))); // NOI18N
-        btnAlterarFunc.setToolTipText("Cadastrar Cliente");
+        btnAlterarFunc.setToolTipText("Salvar alterações no Cadastro do Funcionário");
         btnAlterarFunc.setBorderPainted(false);
         btnAlterarFunc.setContentAreaFilled(false);
         btnAlterarFunc.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -156,7 +183,7 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
         });
 
         btnDeletarFunc.setIcon(new javax.swing.ImageIcon(getClass().getResource("/BDI/Digital/Icones/if_file_delete_48762.png"))); // NOI18N
-        btnDeletarFunc.setToolTipText("Cadastrar Cliente");
+        btnDeletarFunc.setToolTipText("Deletar Funcionário");
         btnDeletarFunc.setBorderPainted(false);
         btnDeletarFunc.setContentAreaFilled(false);
         btnDeletarFunc.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -167,7 +194,7 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
         });
 
         btnCadastraFunc.setIcon(new javax.swing.ImageIcon(getClass().getResource("/BDI/Digital/Icones/if_file_add_48761.png"))); // NOI18N
-        btnCadastraFunc.setToolTipText("Cadastrar Cliente");
+        btnCadastraFunc.setToolTipText("Cadastrar Funcionário");
         btnCadastraFunc.setBorderPainted(false);
         btnCadastraFunc.setContentAreaFilled(false);
         btnCadastraFunc.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -280,7 +307,7 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
 
     private void btnDeletarFuncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeletarFuncActionPerformed
         // TODO add your handling code here:
-        //deletar();
+        deletarFuncionario();
     }//GEN-LAST:event_btnDeletarFuncActionPerformed
 
     private void btnCadastraFuncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastraFuncActionPerformed
@@ -290,12 +317,23 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
 
     private void btnLimparFormFuncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparFormFuncActionPerformed
         // TODO add your handling code here:
-        txtFuncMatricula.setText(null);
-        txtFuncNome.setText(null);
-        //cboFuncCargo.setSelectedItem(null);
-        txtFuncMatricula.setText(null);
-        txtFuncTelefone.setText(null);
+        limparTela();
     }//GEN-LAST:event_btnLimparFormFuncActionPerformed
+
+    private void txtFuncMatriculaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFuncMatriculaKeyTyped
+        // TODO add your handling code here:
+        String caracteresAceitos="0987654321";
+        
+        if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
+            evt.consume();
+        }
+        else{
+            if(txtFuncMatricula.getText().length() == 10){
+                JOptionPane.showMessageDialog(null, "Limite máximo de caracteres permitidos no campo Matrícula atingido!");
+                evt.consume();
+            }
+        }
+    }//GEN-LAST:event_txtFuncMatriculaKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

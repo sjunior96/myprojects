@@ -38,6 +38,51 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
         btnDeletarUsu.setEnabled(false);
     }
     
+    private void limparTela(){
+        txtUsuMatricula.setText(null);
+        txtUsuNome.setText(null);
+        txtUsuLogin.setText(null);
+        txtUsuMatricula.setText(null);
+        txtUsuSenha.setText(null);
+        txtUsuTelefone.setText(null);
+        
+        btnCadastrarUsu.setEnabled(false);
+        btnPesquisarUsu.setEnabled(false);
+        btnAlterarUsu.setEnabled(false);
+        btnDeletarUsu.setEnabled(false);
+    }
+    
+    private boolean validaCampos(String modo){
+        if(modo.equals("ALTERAR")){
+            if(!txtUsuMatricula.getText().isEmpty() &&
+                !txtUsuNome.getText().isEmpty() &&
+                !txtUsuTelefone.getText().isEmpty() &&
+                !txtUsuLogin.getText().isEmpty()){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        else{
+            if(modo.equals("SALVAR")){
+                if(!txtUsuMatricula.getText().isEmpty() &&
+                    !txtUsuNome.getText().isEmpty() &&
+                    !txtUsuTelefone.getText().isEmpty() &&
+                    !txtUsuLogin.getText().isEmpty() &&
+                    !txtUsuSenha.getText().isEmpty()){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            }
+            else{
+                return false;
+            }
+        }
+    }
+    
     private void consultar(){
         String sql = "SELECT * FROM usuario WHERE matriculaUsuario = ?";
         if(!txtUsuMatricula.getText().isEmpty()){
@@ -53,6 +98,8 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
                     txtUsuTelefone.setText(rs.getString(3));
                     txtUsuLogin.setText(rs.getString(4));
                     //txtUsuSenha.setText(rs.getString(5));
+                    btnAlterarUsu.setEnabled(true);
+                    btnDeletarUsu.setEnabled(true);
                 } else {
                     JOptionPane.showMessageDialog(null, "Usuário não cadastrado");
                     txtUsuMatricula.setText(null);
@@ -89,6 +136,8 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
                 //A linha abaixo atualiza a tabela usuario com os dados do formulário
                 pst.executeUpdate();
                 JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso!");
+                //Limpa a tela após finalizar cadastro
+                limparTela();
             
             } catch (Exception e) {
                 if(e.toString().contains("com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Duplicate entry")){
@@ -113,7 +162,7 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
             pst.setString(1, txtUsuMatricula.getText());
             pst.executeUpdate();
             JOptionPane.showMessageDialog(null, "Usuário deletado com sucesso!");
-            
+            limparTela();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
         }
@@ -138,7 +187,7 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
                 pst.setString(6, matriculaPesquisada);
                 pst.executeUpdate();
                 JOptionPane.showMessageDialog(null, "Cadastro atualizado com sucesso!");
-                
+                limparTela();
                 } catch (Exception e) {
                     if(e.toString().contains("com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Duplicate entry")){
                         JOptionPane.showMessageDialog(null, "Já existe um usuário com esta matrícula ou login!");
@@ -216,15 +265,25 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
                 txtUsuLoginCaretUpdate(evt);
             }
         });
+        txtUsuLogin.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtUsuLoginKeyTyped(evt);
+            }
+        });
 
         txtUsuSenha.addCaretListener(new javax.swing.event.CaretListener() {
             public void caretUpdate(javax.swing.event.CaretEvent evt) {
                 txtUsuSenhaCaretUpdate(evt);
             }
         });
+        txtUsuSenha.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtUsuSenhaKeyTyped(evt);
+            }
+        });
 
         btnCadastrarUsu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/BDI/Digital/Icones/if_file_add_48761.png"))); // NOI18N
-        btnCadastrarUsu.setToolTipText("Cadastrar Cliente");
+        btnCadastrarUsu.setToolTipText("Cadastrar Usuário");
         btnCadastrarUsu.setBorderPainted(false);
         btnCadastrarUsu.setContentAreaFilled(false);
         btnCadastrarUsu.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -269,9 +328,14 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
                 txtUsuNomeCaretUpdate(evt);
             }
         });
+        txtUsuNome.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtUsuNomeKeyTyped(evt);
+            }
+        });
 
         btnPesquisarUsu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/BDI/Digital/Icones/if_file_search_48764.png"))); // NOI18N
-        btnPesquisarUsu.setToolTipText("Cadastrar Cliente");
+        btnPesquisarUsu.setToolTipText("Pesquisar Usuário");
         btnPesquisarUsu.setBorderPainted(false);
         btnPesquisarUsu.setContentAreaFilled(false);
         btnPesquisarUsu.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -282,7 +346,7 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
         });
 
         btnAlterarUsu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/BDI/Digital/Icones/if_file_edit_48763.png"))); // NOI18N
-        btnAlterarUsu.setToolTipText("Cadastrar Cliente");
+        btnAlterarUsu.setToolTipText("Salvar alterações no Cadastro do Usuário");
         btnAlterarUsu.setBorderPainted(false);
         btnAlterarUsu.setContentAreaFilled(false);
         btnAlterarUsu.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -293,7 +357,7 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
         });
 
         btnDeletarUsu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/BDI/Digital/Icones/if_file_delete_48762.png"))); // NOI18N
-        btnDeletarUsu.setToolTipText("Cadastrar Cliente");
+        btnDeletarUsu.setToolTipText("Deletar Usuário");
         btnDeletarUsu.setBorderPainted(false);
         btnDeletarUsu.setContentAreaFilled(false);
         btnDeletarUsu.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -308,6 +372,11 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
         txtUsuTelefone.addCaretListener(new javax.swing.event.CaretListener() {
             public void caretUpdate(javax.swing.event.CaretEvent evt) {
                 txtUsuTelefoneCaretUpdate(evt);
+            }
+        });
+        txtUsuTelefone.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtUsuTelefoneKeyTyped(evt);
             }
         });
 
@@ -397,17 +466,7 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
 
     private void btnLimparFormUsuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparFormUsuActionPerformed
         // TODO add your handling code here:
-        txtUsuMatricula.setText(null);
-        txtUsuNome.setText(null);
-        txtUsuLogin.setText(null);
-        txtUsuMatricula.setText(null);
-        txtUsuSenha.setText(null);
-        txtUsuTelefone.setText(null);
-        
-        btnCadastrarUsu.setEnabled(false);
-        btnPesquisarUsu.setEnabled(false);
-        btnAlterarUsu.setEnabled(false);
-        btnDeletarUsu.setEnabled(false);
+        limparTela();
     }//GEN-LAST:event_btnLimparFormUsuActionPerformed
 
     private void txtNroPasseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNroPasseActionPerformed
@@ -417,8 +476,6 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
     private void btnPesquisarUsuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesquisarUsuActionPerformed
         // TODO add your handling code here:
         consultar();
-        btnAlterarUsu.setEnabled(true);
-        btnDeletarUsu.setEnabled(true);
     }//GEN-LAST:event_btnPesquisarUsuActionPerformed
 
     private void btnAlterarUsuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAlterarUsuActionPerformed
@@ -440,7 +497,7 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
         }
         else{
             if(txtUsuMatricula.getText().length() == 10){
-                JOptionPane.showMessageDialog(null, txtUsuMatricula.getText().length());
+                JOptionPane.showMessageDialog(null, "Limite máximo de caracteres permitidos no campo Matrícula atingido!");
                 evt.consume();
             }
         }
@@ -448,6 +505,7 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
 
     private void txtUsuMatriculaCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtUsuMatriculaCaretUpdate
         // TODO add your handling code here:
+        
         //Bloqueia ou libera o botão pesquisar
         if(!txtUsuMatricula.getText().isEmpty()){
             btnPesquisarUsu.setEnabled(true);
@@ -456,7 +514,8 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
             btnPesquisarUsu.setEnabled(false);
         }
         
-        if(txtUsuMatricula.getText().equals(matriculaPesquisada)){
+        //Bloqueia ou libera o botão alterar
+        if(validaCampos("ALTERAR") == true && txtUsuMatricula.getText().equals(matriculaPesquisada)){
             btnAlterarUsu.setEnabled(true);
         }
         else{
@@ -464,16 +523,21 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
         }
         
         //Bloqueia ou libera o botão Cadastrar
-        if(!txtUsuMatricula.getText().isEmpty() &&
-                !txtUsuNome.getText().isEmpty() &&
-                !txtUsuTelefone.getText().isEmpty() &&
-                !txtUsuLogin.getText().isEmpty() &&
-                !txtUsuSenha.getText().isEmpty()){
+        if(validaCampos("SALVAR")){
             btnCadastrarUsu.setEnabled(true);
         }
         else{
             btnCadastrarUsu.setEnabled(false);
         }
+        
+        //Bloqueia ou libera o botão deletar
+        if(!txtUsuMatricula.getText().isEmpty() && txtUsuMatricula.getText().equals(matriculaPesquisada)){
+            btnDeletarUsu.setEnabled(true);
+        }
+        else{
+            btnDeletarUsu.setEnabled(false);
+        }
+        
         
         
     }//GEN-LAST:event_txtUsuMatriculaCaretUpdate
@@ -481,62 +545,125 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
     private void txtUsuNomeCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtUsuNomeCaretUpdate
         // TODO add your handling code here:
         //Bloqueia ou libera o botão Cadastrar
-        if(!txtUsuMatricula.getText().isEmpty() &&
-                !txtUsuNome.getText().isEmpty() &&
-                !txtUsuTelefone.getText().isEmpty() &&
-                !txtUsuLogin.getText().isEmpty() &&
-                !txtUsuSenha.getText().isEmpty()){
+        if(validaCampos("SALVAR")){
             btnCadastrarUsu.setEnabled(true);
         }
         else{
             btnCadastrarUsu.setEnabled(false);
+        }
+        
+        //Bloqueia ou libera o botão alterar
+        if(validaCampos("ALTERAR") == true && txtUsuMatricula.getText().equals(matriculaPesquisada)){
+            btnAlterarUsu.setEnabled(true);
+        }
+        else{
+            btnAlterarUsu.setEnabled(false);
         }
     }//GEN-LAST:event_txtUsuNomeCaretUpdate
 
     private void txtUsuTelefoneCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtUsuTelefoneCaretUpdate
         // TODO add your handling code here:
         //Bloqueia ou libera o botão Cadastrar
-        if(!txtUsuMatricula.getText().isEmpty() &&
-                !txtUsuNome.getText().isEmpty() &&
-                !txtUsuTelefone.getText().isEmpty() &&
-                !txtUsuLogin.getText().isEmpty() &&
-                !txtUsuSenha.getText().isEmpty()){
+        if(validaCampos("SALVAR")){
             btnCadastrarUsu.setEnabled(true);
         }
         else{
             btnCadastrarUsu.setEnabled(false);
+        }
+        
+        //Bloqueia ou libera o botão alterar
+        if(validaCampos("ALTERAR") == true && txtUsuMatricula.getText().equals(matriculaPesquisada)){
+            btnAlterarUsu.setEnabled(true);
+        }
+        else{
+            btnAlterarUsu.setEnabled(false);
         }
     }//GEN-LAST:event_txtUsuTelefoneCaretUpdate
 
     private void txtUsuLoginCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtUsuLoginCaretUpdate
         // TODO add your handling code here:
         //Bloqueia ou libera o botão Cadastrar
-        if(!txtUsuMatricula.getText().isEmpty() &&
-                !txtUsuNome.getText().isEmpty() &&
-                !txtUsuTelefone.getText().isEmpty() &&
-                !txtUsuLogin.getText().isEmpty() &&
-                !txtUsuSenha.getText().isEmpty()){
+        if(validaCampos("SALVAR")){
             btnCadastrarUsu.setEnabled(true);
         }
         else{
             btnCadastrarUsu.setEnabled(false);
+        }
+        
+        if(validaCampos("ALTERAR") == true && txtUsuMatricula.getText().equals(matriculaPesquisada)){
+            btnAlterarUsu.setEnabled(true);
+        }
+        else{
+            btnAlterarUsu.setEnabled(false);
         }
     }//GEN-LAST:event_txtUsuLoginCaretUpdate
 
     private void txtUsuSenhaCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtUsuSenhaCaretUpdate
         // TODO add your handling code here:
         //Bloqueia ou libera o botão Cadastrar
-        if(!txtUsuMatricula.getText().isEmpty() &&
-                !txtUsuNome.getText().isEmpty() &&
-                !txtUsuTelefone.getText().isEmpty() &&
-                !txtUsuLogin.getText().isEmpty() &&
-                !txtUsuSenha.getText().isEmpty()){
+        if(validaCampos("SALVAR")){
             btnCadastrarUsu.setEnabled(true);
         }
         else{
             btnCadastrarUsu.setEnabled(false);
         }
     }//GEN-LAST:event_txtUsuSenhaCaretUpdate
+
+    private void txtUsuNomeKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsuNomeKeyTyped
+        // TODO add your handling code here:
+        String caracteresAceitos="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZáãÁÃéÉíÍóõÓÕúÚ";
+        if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
+            evt.consume();
+        }
+        else{
+            if(txtUsuNome.getText().length() == 80){
+                JOptionPane.showMessageDialog(null, "Limite máximo de caracteres permitidos no campo Nome atingido!");
+                evt.consume();
+            }
+        }
+    }//GEN-LAST:event_txtUsuNomeKeyTyped
+
+    private void txtUsuTelefoneKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsuTelefoneKeyTyped
+        // TODO add your handling code here:
+        String caracteresAceitos="0987654321";
+        if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
+            evt.consume();
+        }
+        else{
+            if(txtUsuTelefone.getText().length() == 16){
+                JOptionPane.showMessageDialog(null, "Limite máximo de caracteres permitidos no campo Telefone atingido!");
+                evt.consume();
+            }
+        }
+    }//GEN-LAST:event_txtUsuTelefoneKeyTyped
+
+    private void txtUsuLoginKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsuLoginKeyTyped
+        // TODO add your handling code here:
+        String caracteresAceitos="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
+            evt.consume();
+        }
+        else{
+            if(txtUsuLogin.getText().length() == 15){
+                JOptionPane.showMessageDialog(null, "Limite máximo de caracteres permitidos no campo Login atingido!");
+                evt.consume();
+            }
+        }
+    }//GEN-LAST:event_txtUsuLoginKeyTyped
+
+    private void txtUsuSenhaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUsuSenhaKeyTyped
+        // TODO add your handling code here:
+        String caracteresAceitos="0987654321abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
+            evt.consume();
+        }
+        else{
+            if(txtUsuSenha.getText().length() == 10){
+                JOptionPane.showMessageDialog(null, "Limite máximo de caracteres permitidos no campo Senha atingido!");
+                evt.consume();
+            }
+        }
+    }//GEN-LAST:event_txtUsuSenhaKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

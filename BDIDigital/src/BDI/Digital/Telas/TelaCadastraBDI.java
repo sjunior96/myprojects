@@ -51,6 +51,37 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         
     }
     
+    private void limparTela(){
+        btnPesquisarBDI.setEnabled(false);
+        txtEncerranteD1.setText(null);
+        txtEncerranteD9.setText(null);
+        txtEncerranteFrete.setText(null);
+        txtInicianteD1.setText(null);
+        txtInicianteD9.setText(null);
+        txtInicianteFrete.setText(null);
+        txtItinerarioBDI.setText(null);
+        txtNomeCobradorBDI.setText(null);
+        txtNomeMotoristaBDI.setText(null);
+        txtNumBDI.setText(null);
+        txtValorD1.setText(null);
+        txtValorD9.setText(null);
+        txtValorFrete.setText(null);
+        cboCobradorBDI.setSelectedItem("Selecione");
+        cboHorarioBDI.setSelectedItem("Selecione");
+        cboMotoristaBDI.setSelectedItem("Selecione");
+        cboPrefixoBDI.setSelectedItem("Selecione");
+        valorD1 = 0.00;
+        valorD9 = 0.00;
+        valorFrete = 0.00;
+        btnAlterarBDI.setEnabled(false);
+        btnDeletarBDI.setEnabled(false);
+        BDIPesquisado = "nulo";
+        //String formato = "#,##0.00";
+        //DecimalFormat formatadorDecimal = new DecimalFormat(formato);
+
+        lblTotalBDI.setText(String.valueOf(formatadorDecimal.format(valorD1+valorD9+valorFrete)).replace('.', ','));
+    }
+    
     private void deletaRegistros(String tabela, String codigoRegistro){
         String sql = "";
         if(tabela.equals("SERIED1")){
@@ -89,6 +120,7 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
                 deletaRegistros("SERIED9", codigosBuscados.get(1));
                 deletaRegistros("FRETE", codigosBuscados.get(2));
                 JOptionPane.showMessageDialog(null, "BDI deletado com sucesso!");
+                limparTela();
                 
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, e);
@@ -156,7 +188,7 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
             //pst.setString(8, txtNumBDI.getText());
             //pst.setString(9, txtNumBDI.getText());
             pst.executeUpdate();
-            
+            limparTela();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
         }
@@ -280,6 +312,7 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
             pst.setString(9, codigosBuscados.get(2));
             pst.executeUpdate();
             JOptionPane.showMessageDialog(null, "BDI cadastrado com sucesso!");
+            limparTela();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
         }
@@ -992,7 +1025,7 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         });
 
         btnAlterarBDI.setIcon(new javax.swing.ImageIcon(getClass().getResource("/BDI/Digital/Icones/if_file_edit_48763.png"))); // NOI18N
-        btnAlterarBDI.setToolTipText("Salvar alterações");
+        btnAlterarBDI.setToolTipText("Salvar alterações no BDI");
         btnAlterarBDI.setBorderPainted(false);
         btnAlterarBDI.setContentAreaFilled(false);
         btnAlterarBDI.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -1526,35 +1559,7 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
 
     private void btnLimparFormBDIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparFormBDIActionPerformed
         // TODO add your handling code here:
-        btnPesquisarBDI.setEnabled(false);
-        txtEncerranteD1.setText(null);
-        txtEncerranteD9.setText(null);
-        txtEncerranteFrete.setText(null);
-        txtInicianteD1.setText(null);
-        txtInicianteD9.setText(null);
-        txtInicianteFrete.setText(null);
-        txtItinerarioBDI.setText(null);
-        txtNomeCobradorBDI.setText(null);
-        txtNomeMotoristaBDI.setText(null);
-        txtNumBDI.setText(null);
-        txtValorD1.setText(null);
-        txtValorD9.setText(null);
-        txtValorFrete.setText(null);
-        cboCobradorBDI.setSelectedItem("Selecione");
-        cboHorarioBDI.setSelectedItem("Selecione");
-        cboMotoristaBDI.setSelectedItem("Selecione");
-        cboPrefixoBDI.setSelectedItem("Selecione");
-        valorD1 = 0.00;
-        valorD9 = 0.00;
-        valorFrete = 0.00;
-        btnAlterarBDI.setEnabled(false);
-        btnDeletarBDI.setEnabled(false);
-        BDIPesquisado = "nulo";
-        //String formato = "#,##0.00";
-        //DecimalFormat formatadorDecimal = new DecimalFormat(formato);
-
-        lblTotalBDI.setText(String.valueOf(formatadorDecimal.format(valorD1+valorD9+valorFrete)).replace('.', ','));
-
+        limparTela();
     }//GEN-LAST:event_btnLimparFormBDIActionPerformed
 
     private void btnPesquisarBDIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesquisarBDIActionPerformed
@@ -1571,6 +1576,7 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
                 alterarTaloesD1();
                 alterarTaloesD9();
                 alterarFretes();
+                JOptionPane.showMessageDialog(null, "BDI Nº " + txtNumBDI.getText() + " atualizado com sucesso!");
             }
             else{ //Mensagem de erro caso os campos não estejam devidamente preenchidos
                 JOptionPane.showMessageDialog(null, "Verifique se todos os campos estão preenchidos corretamente!");
@@ -1581,12 +1587,12 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
     private void btnDeletarBDIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeletarBDIActionPerformed
         // TODO add your handling code here:
         deletarBDI();
-        //deletar();
+        btnAlterarBDI.setEnabled(false);
     }//GEN-LAST:event_btnDeletarBDIActionPerformed
 
     private void btnSalvarBDIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarBDIActionPerformed
         // TODO add your handling code here:
-        codigosBuscados.clear();
+        //codigosBuscados.clear();
         if(checaCodBDI() == false){ //Se não existir BDI cadastrado com o número informado
             if(validaCampos() == true){ //Se os campos estiverem devidamente preenchidos
                 //A linha abaixo insere um BDI no sistema

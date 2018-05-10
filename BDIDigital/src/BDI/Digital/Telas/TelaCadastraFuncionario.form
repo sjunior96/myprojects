@@ -119,6 +119,9 @@
   </Layout>
   <SubComponents>
     <Component class="javax.swing.JTextField" name="txtFuncMatricula">
+      <Events>
+        <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtFuncMatriculaKeyTyped"/>
+      </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="9"/>
       </AuxValues>
@@ -130,7 +133,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/BDI/Digital/Icones/if_file_search_48764.png"/>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="Cadastrar Cliente"/>
+        <Property name="toolTipText" type="java.lang.String" value="Pesquisar Funcion&#xe1;rio"/>
         <Property name="borderPainted" type="boolean" value="false"/>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
@@ -146,7 +149,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/BDI/Digital/Icones/if_file_edit_48763.png"/>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="Cadastrar Cliente"/>
+        <Property name="toolTipText" type="java.lang.String" value="Salvar altera&#xe7;&#xf5;es no Cadastro do Funcion&#xe1;rio"/>
         <Property name="borderPainted" type="boolean" value="false"/>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
@@ -162,7 +165,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/BDI/Digital/Icones/if_file_delete_48762.png"/>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="Cadastrar Cliente"/>
+        <Property name="toolTipText" type="java.lang.String" value="Deletar Funcion&#xe1;rio"/>
         <Property name="borderPainted" type="boolean" value="false"/>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
@@ -178,7 +181,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/BDI/Digital/Icones/if_file_add_48761.png"/>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="Cadastrar Cliente"/>
+        <Property name="toolTipText" type="java.lang.String" value="Cadastrar Funcion&#xe1;rio"/>
         <Property name="borderPainted" type="boolean" value="false"/>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">

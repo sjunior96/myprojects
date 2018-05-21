@@ -30,6 +30,10 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
     public TelaCadastraFuncionario() {
         initComponents();
         conexao = ModuloConexao.conector();
+        btnCadastraFunc.setEnabled(false);
+        btnPesquisaFunc.setEnabled(false);
+        btnAlterarFunc.setEnabled(false);
+        btnDeletarFunc.setEnabled(false);
     }
     
     private void limparTela(){
@@ -37,6 +41,17 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
         txtFuncNome.setText(null);
         txtFuncMatricula.setText(null);
         txtFuncTelefone.setText(null);
+    }
+    
+    private boolean validaCampos(){
+        if(!txtFuncMatricula.getText().isEmpty() &&
+                !txtFuncNome.getText().isEmpty() &&
+                !txtFuncTelefone.getText().isEmpty()){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
     
     private void consultar(){
@@ -58,6 +73,8 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
                         cboFuncCargo.setSelectedItem("Cobrador");
                     }
                     //txtUsuSenha.setText(rs.getString(5));
+                    btnAlterarFunc.setEnabled(true);
+                    btnDeletarFunc.setEnabled(true);
                 } else {
                     JOptionPane.showMessageDialog(null, "Usuário não cadastrado");
                     txtFuncMatricula.setText(null);
@@ -95,7 +112,6 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
                 //A linha abaixo atualiza a tabela usuario com os dados do formulário
                 pst.executeUpdate();
                 JOptionPane.showMessageDialog(null, "Funcionário cadastrado com sucesso!");
-                limparTela();
             } catch (Exception e) {
                 if(e.toString().contains("com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Duplicate entry")){
                     JOptionPane.showMessageDialog(null, "Já existe um usuário com esta matrícula ou login!");
@@ -112,6 +128,27 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
         }
     }
     
+    private void alterarFuncionario(){
+        if(!txtFuncMatricula.getText().isEmpty() &&
+                !txtFuncNome.getText().isEmpty() &&
+                !txtFuncTelefone.getText().isEmpty()){
+            String sql = "UPDATE FUNCIONARIO SET matriculaFuncionario = ?, nomeFuncionario = ?, telefoneFuncionario = ? cargoFuncionario = ? WHERE matriculaFuncionario = ?";
+            try {
+                pst = conexao.prepareStatement(sql);
+                pst.setString(1, txtFuncMatricula.getText());
+                pst.setString(2, txtFuncNome.getText());
+                pst.setString(3, txtFuncTelefone.getText());
+                pst.setString(4, cboFuncCargo.getSelectedItem().toString());
+                pst.setString(5, matriculaPesquisada);
+                pst.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Dados do funcionário atualizados com sucesso!");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
+        
+    }
+    
     private void deletarFuncionario(){
         String sql = "DELETE FROM FUNCIONARIO WHERE matriculaFuncionario = ?";
         try {
@@ -119,8 +156,6 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
             pst.setString(1, txtFuncMatricula.getText());
             pst.executeUpdate();
             JOptionPane.showMessageDialog(null, "Funcionário deletado com sucesso!");
-            limparTela();
-            //limparTela();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
         }
@@ -154,9 +189,25 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
         setMinimumSize(new java.awt.Dimension(948, 579));
         setPreferredSize(new java.awt.Dimension(948, 579));
 
+        txtFuncMatricula.addCaretListener(new javax.swing.event.CaretListener() {
+            public void caretUpdate(javax.swing.event.CaretEvent evt) {
+                txtFuncMatriculaCaretUpdate(evt);
+            }
+        });
         txtFuncMatricula.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtFuncMatriculaKeyTyped(evt);
+            }
+        });
+
+        txtFuncNome.addCaretListener(new javax.swing.event.CaretListener() {
+            public void caretUpdate(javax.swing.event.CaretEvent evt) {
+                txtFuncNomeCaretUpdate(evt);
+            }
+        });
+        txtFuncNome.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtFuncNomeKeyTyped(evt);
             }
         });
 
@@ -207,6 +258,17 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
         jLabel3.setText("Telefone");
 
         jLabel1.setText("Matrícula");
+
+        txtFuncTelefone.addCaretListener(new javax.swing.event.CaretListener() {
+            public void caretUpdate(javax.swing.event.CaretEvent evt) {
+                txtFuncTelefoneCaretUpdate(evt);
+            }
+        });
+        txtFuncTelefone.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtFuncTelefoneKeyTyped(evt);
+            }
+        });
 
         btnLimparFormFunc.setIcon(new javax.swing.ImageIcon(getClass().getResource("/BDI/Digital/Icones/if_CCleaner_33788.png"))); // NOI18N
         btnLimparFormFunc.setToolTipText("Limpar Formulário");
@@ -302,17 +364,20 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
 
     private void btnAlterarFuncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAlterarFuncActionPerformed
         // TODO add your handling code here:
-        //alterar();
+        alterarFuncionario();
+        limparTela();
     }//GEN-LAST:event_btnAlterarFuncActionPerformed
 
     private void btnDeletarFuncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeletarFuncActionPerformed
         // TODO add your handling code here:
         deletarFuncionario();
+        limparTela();
     }//GEN-LAST:event_btnDeletarFuncActionPerformed
 
     private void btnCadastraFuncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastraFuncActionPerformed
         // TODO add your handling code here:
         adicionar();
+        limparTela();
     }//GEN-LAST:event_btnCadastraFuncActionPerformed
 
     private void btnLimparFormFuncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparFormFuncActionPerformed
@@ -324,16 +389,109 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         String caracteresAceitos="0987654321";
         
+        //Verifica se o caractere digitado é um caractere aceito
         if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
-            evt.consume();
+            evt.consume(); //Se não for, consome o evento que inclui esse caractere no campo
         }
-        else{
-            if(txtFuncMatricula.getText().length() == 10){
+        else{ //Se for verifica se atingiu o limite de caracteres do campo
+            if(txtFuncMatricula.getText().length() == 10){ //Se atingiu, não permite mais caracteres naquele campo
                 JOptionPane.showMessageDialog(null, "Limite máximo de caracteres permitidos no campo Matrícula atingido!");
                 evt.consume();
             }
         }
     }//GEN-LAST:event_txtFuncMatriculaKeyTyped
+
+    private void txtFuncMatriculaCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtFuncMatriculaCaretUpdate
+
+        // TODO add your handling code here:
+        if(validaCampos() == true){
+            if(txtFuncMatricula.getText().equals(matriculaPesquisada)){
+                btnAlterarFunc.setEnabled(true);
+            }
+            else{
+                btnAlterarFunc.setEnabled(false);
+            }
+           
+            btnCadastraFunc.setEnabled(true);
+        }
+        else{
+            btnAlterarFunc.setEnabled(false);
+            btnCadastraFunc.setEnabled(false);
+        }
+        
+        if(!txtFuncMatricula.getText().isEmpty()){
+            btnPesquisaFunc.setEnabled(true);
+        }
+        else{
+            btnPesquisaFunc.setEnabled(false);
+        }
+        
+    }//GEN-LAST:event_txtFuncMatriculaCaretUpdate
+
+    private void txtFuncNomeCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtFuncNomeCaretUpdate
+        // TODO add your handling code here:
+        if(validaCampos() == true){
+            if(txtFuncMatricula.getText().equals(matriculaPesquisada)){
+                btnAlterarFunc.setEnabled(true);
+            }
+            else{
+                btnAlterarFunc.setEnabled(false);
+            }
+            
+            btnCadastraFunc.setEnabled(true);
+        }
+        else{
+            btnAlterarFunc.setEnabled(false);
+            btnCadastraFunc.setEnabled(false);
+        }
+    }//GEN-LAST:event_txtFuncNomeCaretUpdate
+
+    private void txtFuncTelefoneCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtFuncTelefoneCaretUpdate
+        // TODO add your handling code here:
+        if(validaCampos() == true){
+            if(txtFuncMatricula.getText().equals(matriculaPesquisada)){
+                btnAlterarFunc.setEnabled(true);
+            }
+            else{
+                btnAlterarFunc.setEnabled(false);
+            }
+            
+            btnCadastraFunc.setEnabled(true);
+        }
+        else{
+            btnAlterarFunc.setEnabled(false);
+            btnCadastraFunc.setEnabled(false);
+        }
+    }//GEN-LAST:event_txtFuncTelefoneCaretUpdate
+
+    private void txtFuncNomeKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFuncNomeKeyTyped
+        // TODO add your handling code here:
+        String caracteresAceitos = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZáãÁÃéÉíÍóõÓÕúÚ";
+        
+        if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
+            evt.consume();
+        }
+        else{
+            if(txtFuncNome.getText().length() == 80){
+                JOptionPane.showMessageDialog(null, "Limite de caracteres permitidos no campo Nome atingido!");
+                evt.consume();
+            }
+        }
+    }//GEN-LAST:event_txtFuncNomeKeyTyped
+
+    private void txtFuncTelefoneKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFuncTelefoneKeyTyped
+        // TODO add your handling code here:
+        String caracteresAceitos="0987654321";
+        if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
+            evt.consume();
+        }
+        else{
+            if(txtFuncTelefone.getText().length() == 16){
+                JOptionPane.showMessageDialog(null, "Limite máximo de caracteres permitidos no campo Telefone atingido!");
+                evt.consume();
+            }
+        }
+    }//GEN-LAST:event_txtFuncTelefoneKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

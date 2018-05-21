@@ -617,7 +617,7 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
         }
         else{
             if(txtUsuNome.getText().length() == 80){
-                JOptionPane.showMessageDialog(null, "Limite máximo de caracteres permitidos no campo Nome atingido!");
+                JOptionPane.showMessageDialog(null, "Limite de caracteres permitidos no campo Nome atingido!");
                 evt.consume();
             }
         }
@@ -658,7 +658,7 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
             evt.consume();
         }
         else{
-            if(txtUsuSenha.getText().length() == 10){
+            if(txtUsuSenha.getText().length() == 15){
                 JOptionPane.showMessageDialog(null, "Limite máximo de caracteres permitidos no campo Senha atingido!");
                 evt.consume();
             }

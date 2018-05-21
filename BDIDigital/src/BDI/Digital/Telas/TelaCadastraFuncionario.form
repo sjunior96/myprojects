@@ -120,6 +120,7 @@
   <SubComponents>
     <Component class="javax.swing.JTextField" name="txtFuncMatricula">
       <Events>
+        <EventHandler event="caretUpdate" listener="javax.swing.event.CaretListener" parameters="javax.swing.event.CaretEvent" handler="txtFuncMatriculaCaretUpdate"/>
         <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtFuncMatriculaKeyTyped"/>
       </Events>
       <AuxValues>
@@ -127,6 +128,10 @@
       </AuxValues>
     </Component>
     <Component class="javax.swing.JTextField" name="txtFuncNome">
+      <Events>
+        <EventHandler event="caretUpdate" listener="javax.swing.event.CaretListener" parameters="javax.swing.event.CaretEvent" handler="txtFuncNomeCaretUpdate"/>
+        <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtFuncNomeKeyTyped"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnPesquisaFunc">
       <Properties>
@@ -203,6 +208,10 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtFuncTelefone">
+      <Events>
+        <EventHandler event="caretUpdate" listener="javax.swing.event.CaretListener" parameters="javax.swing.event.CaretEvent" handler="txtFuncTelefoneCaretUpdate"/>
+        <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtFuncTelefoneKeyTyped"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnLimparFormFunc">
       <Properties>

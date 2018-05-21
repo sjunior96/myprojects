@@ -1223,6 +1223,12 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
             evt.consume();
         }
+        else{
+            if(txtNumBDI.getText().length() == 10){
+                JOptionPane.showMessageDialog(null, "Limite de caracteres atingido!");
+                evt.consume();
+            }
+        }
     }//GEN-LAST:event_txtNumBDIKeyTyped
 
     private void txtInicianteD1CaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtInicianteD1CaretUpdate
@@ -1255,6 +1261,12 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
             evt.consume();
         }
+        else{
+            if(txtInicianteD1.getText().length() == 10){
+                JOptionPane.showMessageDialog(null, "Limite máximo de caracteres permitidos no campo Iniciante atingido!");
+                evt.consume();
+            }
+        }
     }//GEN-LAST:event_txtInicianteD1KeyTyped
 
     private void txtEncerranteD1CaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtEncerranteD1CaretUpdate
@@ -1286,6 +1298,12 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         String caracteresAceitos="0987654321";
         if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
             evt.consume();
+        }
+        else{
+            if(txtEncerranteD1.getText().length() == 10){
+                JOptionPane.showMessageDialog(null, "Limite máximo de caracteres permitidos no campo Encerrante atingido!");
+                evt.consume();
+            }
         }
     }//GEN-LAST:event_txtEncerranteD1KeyTyped
 
@@ -1320,6 +1338,12 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
             evt.consume();
         }
+        else{
+            if(txtInicianteD9.getText().length() == 10){
+                JOptionPane.showMessageDialog(null, "Limite de caracteres atingido!");
+                evt.consume();
+            }
+        }
     }//GEN-LAST:event_txtInicianteD9KeyTyped
 
     private void txtEncerranteD9CaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtEncerranteD9CaretUpdate
@@ -1350,6 +1374,12 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         String caracteresAceitos="0987654321";
         if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
             evt.consume();
+        }
+        else{
+            if(txtEncerranteD9.getText().length() == 10){
+                JOptionPane.showMessageDialog(null, "Limite máximo de caracteres permitidos no campo Encerrante atingido!");
+                evt.consume();
+            }
         }
     }//GEN-LAST:event_txtEncerranteD9KeyTyped
 
@@ -1480,6 +1510,12 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
             evt.consume();
         }
+        else{
+            if(txtInicianteFrete.getText().length() == 10){
+                JOptionPane.showMessageDialog(null, "Limite de caracteres atingido!");
+                evt.consume();
+            }
+        }
     }//GEN-LAST:event_txtInicianteFreteKeyTyped
 
     private void txtEncerranteFreteCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtEncerranteFreteCaretUpdate
@@ -1510,6 +1546,12 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         String caracteresAceitos="0987654321";
         if(!caracteresAceitos.contains(evt.getKeyChar() + "")){
             evt.consume();
+        }
+        else{
+            if(txtEncerranteFrete.getText().length() == 10){
+                JOptionPane.showMessageDialog(null, "Limite de caracteres atingido!");
+                evt.consume();
+            }
         }
     }//GEN-LAST:event_txtEncerranteFreteKeyTyped
 

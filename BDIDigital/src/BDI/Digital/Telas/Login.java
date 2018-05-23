@@ -46,7 +46,7 @@ public class Login extends javax.swing.JFrame {
                 TelaPrincipal telap = new TelaPrincipal();
                 telap.setVisible(true);
                 telap.setLocationRelativeTo(null);
-            
+                this.dispose();
             }
             else {
                 JOptionPane.showMessageDialog(null, "Login e/ou Senha incorreto(s)");
@@ -108,6 +108,11 @@ public class Login extends javax.swing.JFrame {
         jButton1.setMaximumSize(new java.awt.Dimension(63, 23));
         jButton1.setMinimumSize(new java.awt.Dimension(63, 23));
         jButton1.setPreferredSize(new java.awt.Dimension(63, 23));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -172,6 +177,11 @@ public class Login extends javax.swing.JFrame {
             loginA();
         }
     }//GEN-LAST:event_txtFuncSenhaKeyPressed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        System.exit(0);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments

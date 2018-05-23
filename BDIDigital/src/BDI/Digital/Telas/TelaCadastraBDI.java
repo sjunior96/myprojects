@@ -173,20 +173,19 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
     }
     
     private void alteraBDI(){
-        String sql = "UPDATE BDI SET codBDI = ?, dataBDI = ?, horarioBDI = ?, prefixoLinha = ?, matriculaCobradorBDI = ?, "
-                + "matriculaMotoristaBDI = ?, codRegistroD1 = ?, codRegistroD9 = ?, codFrete = ?";
+        String sql = "UPDATE BDI SET codBDI = ?, dataBDI = ?, cod_horario = ?, cod_linha = ?, matriculaCobradorBDI = ?, "
+                + "matriculaMotoristaBDI = ?";
+        PreparedStatement pstAlteraBDI = null;
+                
         try {
             DateFormat formatador = new SimpleDateFormat("dd-MM-yyyy");
-            pst = conexao.prepareStatement(sql);
-            pst.setString(1, txtNumBDI.getText());
-            pst.setString(2, formatador.format(calendarioBDI.getDate()));
-            pst.setString(3, cboHorarioBDI.getSelectedItem().toString());
-            pst.setString(4, cboPrefixoBDI.getSelectedItem().toString());
-            pst.setString(5, cboCobradorBDI.getSelectedItem().toString());
-            pst.setString(6, cboMotoristaBDI.getSelectedItem().toString());
-            //pst.setString(7, txt.getText());
-            //pst.setString(8, txtNumBDI.getText());
-            //pst.setString(9, txtNumBDI.getText());
+            pstAlteraBDI = conexao.prepareStatement(sql);
+            pstAlteraBDI.setString(1, txtNumBDI.getText());
+            pstAlteraBDI.setString(2, formatador.format(calendarioBDI.getDate()));
+            pstAlteraBDI.setString(3, getCodigoConsulta("HORARIOS", "cod_horario", "horario", cboHorarioBDI.getSelectedItem().toString()));
+            pstAlteraBDI.setString(4, getCodigoConsulta("LINHAS", "cod_linha", "prefixoLinha", cboPrefixoBDI.getSelectedItem().toString()));
+            pstAlteraBDI.setString(5, cboCobradorBDI.getSelectedItem().toString());
+            pstAlteraBDI.setString(6, cboMotoristaBDI.getSelectedItem().toString());
             pst.executeUpdate();
             limparTela();
         } catch (Exception e) {
@@ -242,19 +241,21 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
     public int cadastraTalaoD1(){
         String sql = "INSERT INTO SERIED1(iniciantePassagem, encerrantePassagem,"
                                 + " valorRegistro) VALUES(?,?,?)";
-        
+        PreparedStatement pstCadastraTalaoD1 = null;
+        ResultSet rsCadastraTalaoD1 = null;
         try {
-            pst = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setString(1, txtInicianteD1.getText());
-            pst.setString(2, txtEncerranteD1.getText());
-            pst.setString(3, txtValorD1.getText());
-            pst.executeUpdate();
-            rs = pst.getGeneratedKeys();
-            rs.next();
+            pstCadastraTalaoD1 = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            pstCadastraTalaoD1.setString(1, txtInicianteD1.getText());
+            pstCadastraTalaoD1.setString(2, txtEncerranteD1.getText());
+            pstCadastraTalaoD1.setString(3, txtValorD1.getText());
+            pstCadastraTalaoD1.executeUpdate();
+            rsCadastraTalaoD1 = pstCadastraTalaoD1.getGeneratedKeys();
+            rsCadastraTalaoD1.next();
             JOptionPane.showMessageDialog(null, "Os dados foram cadastrados com sucesso na tabelas de Talões D1!");
             //JOptionPane.showMessageDialog(null, rs.getInt(1));
-            codigosBuscados.add(Integer.toString(rs.getInt(1)));
-            return rs.getInt(1);
+            codigosBuscados.add(Integer.toString(rsCadastraTalaoD1.getInt(1)));
+            JOptionPane.showMessageDialog(null, "Codigo D1 gerado: " + rsCadastraTalaoD1.getInt(1));
+            return rsCadastraTalaoD1.getInt(1);
         } catch (Exception e) {
             if(e.toString().contains("com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Duplicate entry ")){
                 JOptionPane.showMessageDialog(null, "Verifique iniciante possivelmente já utilizado!");
@@ -293,52 +294,80 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         return -1;
     }
     
+    public String getCodigoConsulta(String tabela, String campoDaTabela, String campoDaTabela2, String valorConsulta){
+        String sql = "SELECT " + tabela + "." + campoDaTabela + " FROM " + tabela + " WHERE " + campoDaTabela2 + " = ?";
+        //String sql = "SELECT HORARIOS.cod_horario FROM HORARIOS WHERE cod_horario = ?";
+        ResultSet rsCodigoConsulta = null;
+        
+        try {
+            pst = conexao.prepareStatement(sql);
+            pst.setString(1, valorConsulta);
+            rsCodigoConsulta = pst.executeQuery();
+            if(rsCodigoConsulta.next()){
+                return rsCodigoConsulta.getString(1);
+            }else{
+                return "failed";
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Falhou na getCodigoConsulta()\n" + e);
+        }
+        return "failed";
+    }
+    
+    
     public void cadastraBDI(){
-        String sqlBDI = "INSERT INTO BDI(codBDI, dataBDI, horarioBDI, "
-                + "prefixoLinha, matriculaCobradorBDI, matriculaMotoristaBDI, codRegistroD1,"
+        String sqlBDI = "INSERT INTO BDI(codBDI, dataBDI, cod_horario, "
+                + "cod_linha, matriculaCobradorBDI, matriculaMotoristaBDI, codRegistroD1,"
                 + "codRegistroD9, codFrete) VALUES(?,?,?,?,?,?,?,?,?)";
+        PreparedStatement pstCadastraBDI = null;
+        
+        
         try {
             DateFormat formatador = new SimpleDateFormat("dd-MM-yyyy");
-            pst = conexao.prepareStatement(sqlBDI);
-            pst.setString(1, txtNumBDI.getText());
+            pstCadastraBDI = conexao.prepareStatement(sqlBDI);
+            pstCadastraBDI.setString(1, txtNumBDI.getText());
             //JOptionPane.showMessageDialog(null, formatador.format(calendarioBDI.getDate()));
-            pst.setString(2, formatador.format(calendarioBDI.getDate()));
-            pst.setString(3, cboHorarioBDI.getSelectedItem().toString());
-            pst.setString(4, cboPrefixoBDI.getSelectedItem().toString());
-            pst.setString(5, cboCobradorBDI.getSelectedItem().toString());
-            pst.setString(6, cboMotoristaBDI.getSelectedItem().toString());
-            pst.setString(7, codigosBuscados.get(0));
-            pst.setString(8, codigosBuscados.get(1));
-            pst.setString(9, codigosBuscados.get(2));
-            pst.executeUpdate();
+            pstCadastraBDI.setString(2, formatador.format(calendarioBDI.getDate()));
+            //pst.setString(3, cboHorarioBDI.getSelectedItem().toString());
+            pstCadastraBDI.setString(3, getCodigoConsulta("HORARIOS", "cod_horario", "horario", cboHorarioBDI.getSelectedItem().toString()));
+            //pst.setString(4, cboPrefixoBDI.getSelectedItem().toString());
+            pstCadastraBDI.setString(4, getCodigoConsulta("LINHAS", "cod_linha", "prefixoLinha", cboPrefixoBDI.getSelectedItem().toString()));
+            pstCadastraBDI.setString(5, cboCobradorBDI.getSelectedItem().toString());
+            pstCadastraBDI.setString(6, cboMotoristaBDI.getSelectedItem().toString());
+            pstCadastraBDI.setString(7, Integer.toString(cadastraTalaoD1()));
+            pstCadastraBDI.setString(8, Integer.toString(cadastraTalaoD9()));
+            pstCadastraBDI.setString(9, Integer.toString(cadastraFrete()));
+            pstCadastraBDI.executeUpdate();
             JOptionPane.showMessageDialog(null, "BDI cadastrado com sucesso!");
             limparTela();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e);
+            JOptionPane.showMessageDialog(null, "Falhou na cadastraBDI()\n" + e);
         }
     }
     
     private void consultaItinerario(){ 
         ResultSet rsItinerario;
         //String sql = "SELECT itinerarioLinha FROM linhas WHERE prefixoLinha = ?";
-        String sql = "SELECT LINHAS.itinerarioLinha, HORARIOS.horario FROM linhas \n" +
-                        "INNER JOIN HORARIOS ON HORARIOS.prefixoLinha = ?\n" +
-                        "WHERE LINHAS.prefixoLinha = ?";
+        String sql = "SELECT HORARIOS.horario, LINHAS.itinerarioLinha FROM HORARIOS_POR_LINHA\n" +
+                "INNER JOIN LINHAS ON LINHAS.cod_linha = HORARIOS_POR_LINHA.cod_linha\n" +
+                "INNER JOIN HORARIOS ON HORARIOS.cod_horario = HORARIOS_POR_LINHA.cod_horario\n" +
+                "WHERE LINHAS.cod_linha = (SELECT cod_linha FROM LINHAS WHERE prefixoLinha = ?);\n";
         if(!cboPrefixoBDI.getSelectedItem().toString().equals("Selecione")){
             try {
                 cboHorarioBDI.removeAllItems();
                 pst = conexao.prepareStatement(sql);
                 pst.setString(1, cboPrefixoBDI.getSelectedItem().toString());
-                pst.setString(2, cboPrefixoBDI.getSelectedItem().toString());
+                //pst.setString(2, cboPrefixoBDI.getSelectedItem().toString());
                 rsItinerario = pst.executeQuery();
                 while(rsItinerario.next()){
-                    cboHorarioBDI.addItem(rsItinerario.getString(2));
-                    txtItinerarioBDI.setText(rsItinerario.getString(1));
+                    cboHorarioBDI.addItem(rsItinerario.getString(1));
+                    txtItinerarioBDI.setText(rsItinerario.getString(2));
                 }
             } catch (Exception e) {
                 //Encontrei o erro atual
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Falhou aqui\n" + e);
+                JOptionPane.showMessageDialog(null, "Falhou aqui na consulta itinerario\n" + e);
             }
         }
     }
@@ -392,7 +421,7 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
     
     private void consultaBDI(){
         ResultSet rs2;
-        String sql = "SELECT BDI.codBDI NºBDI, BDI.dataBDI DIA, \n" +
+        /*String sql = "SELECT BDI.codBDI NºBDI, BDI.dataBDI DIA, \n" +
             "BDI.horarioBDI HORARIO, \n" +
             "BDI.prefixoLinha PREFIXO, L.itinerarioLinha ITINERARIO, \n" +
             "BDI.matriculaCobradorBDI MATCOBRADOR, F.nomeFuncionario NOMECOBRADOR, \n" +
@@ -407,7 +436,25 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
             "INNER JOIN SERIED1 ON SERIED1.cod_registro = BDI.codRegistroD1\n" +
             "INNER JOIN SERIED9 ON SERIED9.cod_registro = BDI.codRegistroD9\n" +
             "INNER JOIN FRETE ON FRETE.codFrete = BDI.codFrete\n" +
-            "	WHERE BDI.codBDI = ?";
+            "	WHERE BDI.codBDI = ?";*/
+        
+        String sql =    "SELECT BDI.codBDI NºBDI, BDI.dataBDI DIA,HORARIOS.horario HORARIO,\n" +
+                        "LINHAS.prefixoLinha PREFIXO, LINHAS.itinerarioLinha ITINERARIO,\n" +
+                        "BDI.matriculaCobradorBDI MATCOBRADOR, F.nomeFuncionario NOMECOBRADOR,\n" +
+                        "BDI.matriculaMotoristaBDI MATMOTORISTA, FUNCIONARIO.nomeFuncionario NOMEMOTORISTA,\n" +
+                        "BDI.codRegistroD1 CD1, SERIED1.iniciantePassagem INICIOD1, SERIED1.encerrantePassagem FIMD1, SERIED1.valorRegistro VALORD1,\n" +
+                        "BDI.codRegistroD9 CD9, SERIED9.iniciantePassagem INICIOD9, SERIED9.encerrantePassagem FIMD9, SERIED9.valorRegistro VALORD9,\n" +
+                        "BDI.codFrete CDFRETE, FRETE.inicianteFrete INICIOFRETE, FRETE.encerranteFrete FIMFRETE, FRETE.valorFrete VALORFRETE FROM BDI\n" +
+                        "INNER JOIN HORARIOS ON HORARIOS.cod_horario = BDI.cod_horario\n" +
+                        "INNER JOIN HORARIOS_POR_LINHA\n" +
+                        "INNER JOIN LINHAS ON LINHAS.cod_linha = HORARIOS_POR_LINHA.cod_linha\n" +
+                        "INNER JOIN FUNCIONARIO F ON F.matriculaFuncionario = BDI.matriculaCobradorBDI\n" +
+                        "INNER JOIN FUNCIONARIO ON FUNCIONARIO.matriculaFuncionario = BDI.matriculaMotoristaBDI\n" +
+                        "INNER JOIN SERIED1 ON SERIED1.cod_registro = BDI.codRegistroD1\n" +
+                        "INNER JOIN SERIED9 ON SERIED9.cod_registro = BDI.codRegistroD9\n" +
+                        "INNER JOIN FRETE ON FRETE.codFrete = BDI.codFrete\n" +
+                        "WHERE BDI.codBDI = ? and horarios_por_linha.cod_linha = BDI.cod_linha\n" +
+                        "AND HORARIOS_POR_LINHA.cod_horario = HORARIOS.cod_horario;";
         
         try {
             pst = conexao.prepareStatement(sql);
@@ -1638,9 +1685,6 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         if(checaCodBDI() == false){ //Se não existir BDI cadastrado com o número informado
             if(validaCampos() == true){ //Se os campos estiverem devidamente preenchidos
                 //A linha abaixo insere um BDI no sistema
-                cadastraTalaoD1();
-                cadastraTalaoD9();
-                cadastraFrete();
                 cadastraBDI();
             }
             else{ //Mensagem de erro caso os campos não estejam devidamente preenchidos

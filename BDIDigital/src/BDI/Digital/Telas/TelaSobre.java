@@ -5,6 +5,8 @@
  */
 package BDI.Digital.Telas;
 
+import java.awt.Dimension;
+
 /**
  *
  * @author Silvio
@@ -16,6 +18,11 @@ public class TelaSobre extends javax.swing.JInternalFrame {
      */
     public TelaSobre() {
         initComponents();
+    }
+    
+    public void setPosicao(){
+        Dimension d = this.getDesktopPane().getSize();
+        this.setLocation((d.width - this.getSize().width) / 2, (d.height - this.getSize().height) / 2); 
     }
 
     /**
@@ -33,24 +40,22 @@ public class TelaSobre extends javax.swing.JInternalFrame {
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
 
         setClosable(true);
+        setTitle("Sobre");
 
         jLabel1.setText("Desenvolvido por:");
 
-        jLabel2.setText("Silvio Júnior");
+        jLabel2.setText("Silvio José Da Silva Júnior");
 
-        jLabel3.setText("Alexandre Sousa");
+        jLabel3.setText("Alexandre Sousa da Silva");
 
-        jLabel4.setText("Wesley Pereira");
+        jLabel4.setText("Wesley Pereira do Nascimento");
 
-        jLabel5.setText("Paulo Augusto");
+        jLabel5.setText("Paulo Augusto de Oliveira Lemos");
 
         jLabel6.setText("Versão 1.0");
-
-        jLabel7.setText("Todos os direitos reservados");
 
         jLabel8.setText("Em amada memória de Eduardo Ribeiro.");
 
@@ -74,10 +79,7 @@ public class TelaSobre extends javax.swing.JInternalFrame {
                                     .addComponent(jLabel5)))
                             .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jLabel6))
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel7)))
+                                .addComponent(jLabel6)))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 194, Short.MAX_VALUE)
@@ -97,11 +99,9 @@ public class TelaSobre extends javax.swing.JInternalFrame {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 64, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
                 .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel7)
-                .addGap(49, 49, 49)
+                .addGap(74, 74, 74)
                 .addComponent(jLabel8)
                 .addContainerGap())
         );
@@ -117,7 +117,6 @@ public class TelaSobre extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     // End of variables declaration//GEN-END:variables
 }

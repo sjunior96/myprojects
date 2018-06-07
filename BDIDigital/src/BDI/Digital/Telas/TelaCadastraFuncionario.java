@@ -6,6 +6,7 @@
 package BDI.Digital.Telas;
 
 import BDI.Digital.DAL.ModuloConexao;
+import java.awt.Dimension;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,6 +35,11 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
         btnPesquisaFunc.setEnabled(false);
         btnAlterarFunc.setEnabled(false);
         btnDeletarFunc.setEnabled(false);
+    }
+    
+    public void setPosicao(){
+        Dimension d = this.getDesktopPane().getSize();
+        this.setLocation((d.width - this.getSize().width) / 2, (d.height - this.getSize().height) / 2); 
     }
     
     private void limparTela(){
@@ -185,9 +191,10 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
         cboFuncCargo = new javax.swing.JComboBox<>();
 
         setClosable(true);
-        setMaximumSize(new java.awt.Dimension(948, 579));
-        setMinimumSize(new java.awt.Dimension(948, 579));
-        setPreferredSize(new java.awt.Dimension(948, 579));
+        setTitle("Cadastrar Motoristas/Cobradores");
+        setMaximumSize(new java.awt.Dimension(588, 400));
+        setMinimumSize(new java.awt.Dimension(588, 400));
+        setPreferredSize(new java.awt.Dimension(588, 400));
 
         txtFuncMatricula.addCaretListener(new javax.swing.event.CaretListener() {
             public void caretUpdate(javax.swing.event.CaretEvent evt) {
@@ -298,16 +305,17 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel2)
                                     .addComponent(jLabel1)
-                                    .addComponent(jLabel3))
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(txtFuncMatricula, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
                                     .addComponent(txtFuncNome)
                                     .addComponent(txtFuncTelefone)))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel4)
+                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(cboFuncCargo, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(layout.createSequentialGroup()
@@ -321,7 +329,7 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
                         .addComponent(btnDeletarFunc, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnLimparFormFunc, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(502, Short.MAX_VALUE))
+                .addContainerGap(142, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -351,10 +359,10 @@ public class TelaCadastraFuncionario extends javax.swing.JInternalFrame {
                             .addComponent(btnPesquisaFunc)
                             .addComponent(btnDeletarFunc)))
                     .addComponent(btnLimparFormFunc))
-                .addContainerGap(330, Short.MAX_VALUE))
+                .addContainerGap(151, Short.MAX_VALUE))
         );
 
-        setBounds(0, 0, 963, 579);
+        setBounds(0, 0, 588, 400);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnPesquisaFuncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesquisaFuncActionPerformed

@@ -6,6 +6,7 @@
 package BDI.Digital.Telas;
 
 import BDI.Digital.DAL.ModuloConexao;
+import java.awt.Dimension;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -37,6 +38,7 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
     String BDIPesquisado;
     ArrayList<String> codigosBuscados = new ArrayList<>();
     int contadorCamposPreenchidos = 0;
+    String numBDIBuscado = "";
     
     String formato = "#,##0.00";
     DecimalFormat formatadorDecimal = new DecimalFormat(formato);
@@ -49,6 +51,11 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         btnAlterarBDI.setEnabled(false);
         btnDeletarBDI.setEnabled(false);
         
+    }
+    
+    public void setPosicao(){
+        Dimension d = this.getDesktopPane().getSize();
+        this.setLocation((d.width - this.getSize().width) / 2, (d.height - this.getSize().height) / 2); 
     }
     
     private void limparTela(){
@@ -172,21 +179,38 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         }
     }
     
+    /*private void alteraHorariosPorLinha(){
+        String sqlAlteraHorariosPorLinha = "UPDATE HORARIOS_POR_LINHA SET cod_horario = ?, cod_linha = ? WHERE cod_horario = ?"
+                + "AND cod_linha = ?";
+        PreparedStatement pstAlteraHorariosPorLinha = null;
+        try {
+            pstAlteraHorariosPorLinha = conexao.prepareStatement(sqlAlteraHorariosPorLinha);
+            pstAlteraHorariosPorLinha.setString(1, getCodigoConsulta("HORARIOS", "cod_horario", "horario", cboHorarioBDI.getSelectedItem().toString()));
+            pstAlteraHorariosPorLinha.setString(2, getCodigoConsulta("LINHAS", "cod_linha", "prefixoLinha", cboPrefixoBDI.getSelectedItem().toString()));
+            pstAlteraHorariosPorLinha.setString(3, codigosBuscados.get(3));
+            pstAlteraHorariosPorLinha.setString(4, codigosBuscados.get(4));
+            pstAlteraHorariosPorLinha.executeUpdate();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }*/
+    
     private void alteraBDI(){
-        String sql = "UPDATE BDI SET codBDI = ?, dataBDI = ?, cod_horario = ?, cod_linha = ?, matriculaCobradorBDI = ?, "
-                + "matriculaMotoristaBDI = ?";
+        String sqlAlteraBDI = "UPDATE BDI SET codBDI = ?, dataBDI = ?, cod_horario = ?, cod_linha = ?, matriculaCobradorBDI = ?, "
+                + "matriculaMotoristaBDI = ? WHERE codBDI = ?";
         PreparedStatement pstAlteraBDI = null;
                 
         try {
             DateFormat formatador = new SimpleDateFormat("dd-MM-yyyy");
-            pstAlteraBDI = conexao.prepareStatement(sql);
+            pstAlteraBDI = conexao.prepareStatement(sqlAlteraBDI);
             pstAlteraBDI.setString(1, txtNumBDI.getText());
             pstAlteraBDI.setString(2, formatador.format(calendarioBDI.getDate()));
-            pstAlteraBDI.setString(3, getCodigoConsulta("HORARIOS", "cod_horario", "horario", cboHorarioBDI.getSelectedItem().toString()));
-            pstAlteraBDI.setString(4, getCodigoConsulta("LINHAS", "cod_linha", "prefixoLinha", cboPrefixoBDI.getSelectedItem().toString()));
+            pstAlteraBDI.setString(3, getCodigoHorario());
+            pstAlteraBDI.setString(4, getCodigoLinha());
             pstAlteraBDI.setString(5, cboCobradorBDI.getSelectedItem().toString());
             pstAlteraBDI.setString(6, cboMotoristaBDI.getSelectedItem().toString());
-            pst.executeUpdate();
+            pstAlteraBDI.setString(7, numBDIBuscado);
+            pstAlteraBDI.executeUpdate();
             limparTela();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
@@ -229,11 +253,11 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
             pst.executeUpdate();
             rsFretes = pst.getGeneratedKeys();
             rsFretes.next();
-            JOptionPane.showMessageDialog(null, "Os dados foram cadastrados com sucesso na tabela de Fretes!");
+            //JOptionPane.showMessageDialog(null, "Os dados foram cadastrados com sucesso na tabela de Fretes!");
             codigosBuscados.add(Integer.toString(rsFretes.getInt(1)));
             return rsFretes.getInt(1);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERRO AO CADASTRAR OS FRETES!!!!!!!!!!!!!" + e);
+            JOptionPane.showMessageDialog(null, "Verifique iniciante possivelmente já utilizado no talão de Fretes!");
         }
         return -1;
     }
@@ -251,14 +275,13 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
             pstCadastraTalaoD1.executeUpdate();
             rsCadastraTalaoD1 = pstCadastraTalaoD1.getGeneratedKeys();
             rsCadastraTalaoD1.next();
-            JOptionPane.showMessageDialog(null, "Os dados foram cadastrados com sucesso na tabelas de Talões D1!");
+            //JOptionPane.showMessageDialog(null, "Os dados foram cadastrados com sucesso na tabelas de Talões D1!");
             //JOptionPane.showMessageDialog(null, rs.getInt(1));
             codigosBuscados.add(Integer.toString(rsCadastraTalaoD1.getInt(1)));
-            JOptionPane.showMessageDialog(null, "Codigo D1 gerado: " + rsCadastraTalaoD1.getInt(1));
             return rsCadastraTalaoD1.getInt(1);
         } catch (Exception e) {
             if(e.toString().contains("com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Duplicate entry ")){
-                JOptionPane.showMessageDialog(null, "Verifique iniciante possivelmente já utilizado!");
+                JOptionPane.showMessageDialog(null, "Verifique iniciante possivelmente já utilizado para os talões D - 1!");
             }
             else{
                 JOptionPane.showMessageDialog(null, e);
@@ -279,12 +302,12 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
             pst.executeUpdate();
             rs = pst.getGeneratedKeys();
             rs.next();
-            JOptionPane.showMessageDialog(null, "Os dados foram cadastrados com sucesso na tabela de Talões D9!");
+            //JOptionPane.showMessageDialog(null, "Os dados foram cadastrados com sucesso na tabela de Talões D9!");
             codigosBuscados.add(Integer.toString(rs.getInt(1)));
             return rs.getInt(1);
         } catch (Exception e) {
             if(e.toString().contains("com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Duplicate entry ")){
-                JOptionPane.showMessageDialog(null, "Verifique iniciante possivelmente já utilizado!");
+                JOptionPane.showMessageDialog(null, "Verifique iniciante possivelmente já utilizado para os talões D - 9!");
             }
             else{
                 JOptionPane.showMessageDialog(null, "Falha no Cadastra Talao D9" + e);
@@ -294,24 +317,47 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         return -1;
     }
     
-    public String getCodigoConsulta(String tabela, String campoDaTabela, String campoDaTabela2, String valorConsulta){
-        String sql = "SELECT " + tabela + "." + campoDaTabela + " FROM " + tabela + " WHERE " + campoDaTabela2 + " = ?";
-        //String sql = "SELECT HORARIOS.cod_horario FROM HORARIOS WHERE cod_horario = ?";
-        ResultSet rsCodigoConsulta = null;
+    public String getCodigoHorario(){
+        String sqlGetCodigoHorario = "SELECT HORARIOS.cod_horario FROM HORARIOS WHERE horario = ?";
+        PreparedStatement pstGetCodigoHorario = null;
+        ResultSet rsGetCodigoHorario = null;
         
         try {
-            pst = conexao.prepareStatement(sql);
-            pst.setString(1, valorConsulta);
-            rsCodigoConsulta = pst.executeQuery();
-            if(rsCodigoConsulta.next()){
-                return rsCodigoConsulta.getString(1);
-            }else{
+            pstGetCodigoHorario = conexao.prepareStatement(sqlGetCodigoHorario);
+            pstGetCodigoHorario.setString(1, cboHorarioBDI.getSelectedItem().toString());
+            rsGetCodigoHorario = pstGetCodigoHorario.executeQuery();
+            if(rsGetCodigoHorario.next()){
+                return rsGetCodigoHorario.getString(1);
+            }
+            else{
                 return "failed";
             }
-            
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Falhou na getCodigoConsulta()\n" + e);
+            JOptionPane.showMessageDialog(null, "Erro na getCodigoHorario\n" + e);
         }
+        
+        return "failed";
+    }
+    
+    public String getCodigoLinha(){
+        String sqlGetCodigoLinha = "SELECT LINHAS.cod_linha FROM LINHAS WHERE prefixoLinha = ?";
+        PreparedStatement pstGetCodigoLinha = null;
+        ResultSet rsGetCodigoLinha = null;
+        
+        try {
+            pstGetCodigoLinha = conexao.prepareStatement(sqlGetCodigoLinha);
+            pstGetCodigoLinha.setString(1, cboPrefixoBDI.getSelectedItem().toString());
+            rsGetCodigoLinha = pstGetCodigoLinha.executeQuery();
+            if(rsGetCodigoLinha.next()){
+                return rsGetCodigoLinha.getString(1);
+            }
+            else{
+                return "failed";
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Erro na getCodigoLinha\n" + e);
+        }
+        
         return "failed";
     }
     
@@ -330,9 +376,9 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
             //JOptionPane.showMessageDialog(null, formatador.format(calendarioBDI.getDate()));
             pstCadastraBDI.setString(2, formatador.format(calendarioBDI.getDate()));
             //pst.setString(3, cboHorarioBDI.getSelectedItem().toString());
-            pstCadastraBDI.setString(3, getCodigoConsulta("HORARIOS", "cod_horario", "horario", cboHorarioBDI.getSelectedItem().toString()));
+            pstCadastraBDI.setString(3, getCodigoLinha());
             //pst.setString(4, cboPrefixoBDI.getSelectedItem().toString());
-            pstCadastraBDI.setString(4, getCodigoConsulta("LINHAS", "cod_linha", "prefixoLinha", cboPrefixoBDI.getSelectedItem().toString()));
+            pstCadastraBDI.setString(4, getCodigoLinha());
             pstCadastraBDI.setString(5, cboCobradorBDI.getSelectedItem().toString());
             pstCadastraBDI.setString(6, cboMotoristaBDI.getSelectedItem().toString());
             pstCadastraBDI.setString(7, Integer.toString(cadastraTalaoD1()));
@@ -342,11 +388,13 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, "BDI cadastrado com sucesso!");
             limparTela();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Falhou na cadastraBDI()\n" + e);
+            if(!e.toString().contains("com.mysql.jdbc.MysqlDataTruncation: Data truncation: Out of range value for column ")){
+                JOptionPane.showMessageDialog(null, e);
+            }
         }
     }
     
-    private void consultaItinerario(){ 
+    public void consultaItinerario(){ 
         ResultSet rsItinerario;
         //String sql = "SELECT itinerarioLinha FROM linhas WHERE prefixoLinha = ?";
         String sql = "SELECT HORARIOS.horario, LINHAS.itinerarioLinha FROM HORARIOS_POR_LINHA\n" +
@@ -360,10 +408,27 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
                 pst.setString(1, cboPrefixoBDI.getSelectedItem().toString());
                 //pst.setString(2, cboPrefixoBDI.getSelectedItem().toString());
                 rsItinerario = pst.executeQuery();
-                while(rsItinerario.next()){
+                
+                if(rsItinerario.next()){
                     cboHorarioBDI.addItem(rsItinerario.getString(1));
                     txtItinerarioBDI.setText(rsItinerario.getString(2));
+                    while(rsItinerario.next()){
+                        cboHorarioBDI.addItem(rsItinerario.getString(1));
+                        txtItinerarioBDI.setText(rsItinerario.getString(2));
+                    }
                 }
+                else{
+                    JOptionPane.showMessageDialog(null, "Não existem horários cadastrados para esta Linha!");
+                }
+                
+                
+                /*while(rsItinerario.next()){
+                    cboHorarioBDI.addItem(rsItinerario.getString(1));
+                    txtItinerarioBDI.setText(rsItinerario.getString(2));
+                    System.out.println(rsItinerario.getString(2) + " - " + rsItinerario.getString(1));
+                }*/
+                
+                
             } catch (Exception e) {
                 //Encontrei o erro atual
                 e.printStackTrace();
@@ -421,24 +486,9 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
     
     private void consultaBDI(){
         ResultSet rs2;
-        /*String sql = "SELECT BDI.codBDI NºBDI, BDI.dataBDI DIA, \n" +
-            "BDI.horarioBDI HORARIO, \n" +
-            "BDI.prefixoLinha PREFIXO, L.itinerarioLinha ITINERARIO, \n" +
-            "BDI.matriculaCobradorBDI MATCOBRADOR, F.nomeFuncionario NOMECOBRADOR, \n" +
-            "BDI.matriculaMotoristaBDI MATMOTORISTA, FUNCIONARIO.nomeFuncionario NOMEMOTORISTA,  \n" +
-            "BDI.codRegistroD1 CD1, SERIED1.iniciantePassagem INICIOD1, SERIED1.encerrantePassagem FIMD1, SERIED1.valorRegistro VALORD1, \n" +
-            "BDI.codRegistroD9 CD9, SERIED9.iniciantePassagem INICIOD9, SERIED9.encerrantePassagem FIMD9, SERIED9.valorRegistro VALORD9, \n" +
-            "BDI.codFrete CDFRETE, FRETE.inicianteFrete INICIOFRETE, FRETE.encerranteFrete FIMFRETE, FRETE.valorFrete VALORFRETE FROM BDI\n" +
-            "INNER JOIN HORARIOS ON HORARIOS.horario = BDI.horarioBDI AND horarios.prefixoLinha = BDI.prefixoLinha\n" +
-            "INNER JOIN LINHAS L ON L.prefixoLinha = HORARIOS.prefixoLinha\n" +
-            "INNER JOIN FUNCIONARIO F ON F.matriculaFuncionario = BDI.matriculaCobradorBDI\n" +
-            "INNER JOIN FUNCIONARIO ON FUNCIONARIO.matriculaFuncionario = BDI.matriculaMotoristaBDI\n" +
-            "INNER JOIN SERIED1 ON SERIED1.cod_registro = BDI.codRegistroD1\n" +
-            "INNER JOIN SERIED9 ON SERIED9.cod_registro = BDI.codRegistroD9\n" +
-            "INNER JOIN FRETE ON FRETE.codFrete = BDI.codFrete\n" +
-            "	WHERE BDI.codBDI = ?";*/
+        PreparedStatement pstConsultaBDI = null;
         
-        String sql =    "SELECT BDI.codBDI NºBDI, BDI.dataBDI DIA,HORARIOS.horario HORARIO,\n" +
+        /*String sqlConsultaBDI =    "SELECT BDI.codBDI NºBDI, BDI.dataBDI DIA,HORARIOS.horario HORARIO,\n" +
                         "LINHAS.prefixoLinha PREFIXO, LINHAS.itinerarioLinha ITINERARIO,\n" +
                         "BDI.matriculaCobradorBDI MATCOBRADOR, F.nomeFuncionario NOMECOBRADOR,\n" +
                         "BDI.matriculaMotoristaBDI MATMOTORISTA, FUNCIONARIO.nomeFuncionario NOMEMOTORISTA,\n" +
@@ -454,18 +504,37 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
                         "INNER JOIN SERIED9 ON SERIED9.cod_registro = BDI.codRegistroD9\n" +
                         "INNER JOIN FRETE ON FRETE.codFrete = BDI.codFrete\n" +
                         "WHERE BDI.codBDI = ? and horarios_por_linha.cod_linha = BDI.cod_linha\n" +
-                        "AND HORARIOS_POR_LINHA.cod_horario = HORARIOS.cod_horario;";
+                        "AND HORARIOS_POR_LINHA.cod_horario = HORARIOS.cod_horario;";*/
+        String sqlConsultaBDI = "SELECT BDI.codBDI NºBDI, BDI.dataBDI DIA,HORARIOS.horario HORARIO,\n" +
+"LINHAS.prefixoLinha PREFIXO, LINHAS.itinerarioLinha ITINERARIO,\n" +
+"BDI.matriculaCobradorBDI MATCOBRADOR, F.nomeFuncionario NOMECOBRADOR,\n" +
+"BDI.matriculaMotoristaBDI MATMOTORISTA, FUNCIONARIO.nomeFuncionario NOMEMOTORISTA,\n" +
+"BDI.codRegistroD1 CD1, SERIED1.iniciantePassagem INICIOD1, SERIED1.encerrantePassagem FIMD1, SERIED1.valorRegistro VALORD1,\n" +
+"BDI.codRegistroD9 CD9, SERIED9.iniciantePassagem INICIOD9, SERIED9.encerrantePassagem FIMD9, SERIED9.valorRegistro VALORD9,\n" +
+"BDI.codFrete CDFRETE, FRETE.inicianteFrete INICIOFRETE, FRETE.encerranteFrete FIMFRETE, FRETE.valorFrete VALORFRETE FROM BDI\n" +
+"INNER JOIN HORARIOS ON HORARIOS.cod_horario = BDI.cod_horario\n" +
+"inner join horarios_por_linha\n" +
+"INNER JOIN LINHAS ON LINHAS.cod_linha = HORARIOS_POR_LINHA.cod_linha\n" +
+"INNER JOIN FUNCIONARIO F ON F.matriculaFuncionario = BDI.matriculaCobradorBDI\n" +
+"INNER JOIN FUNCIONARIO ON FUNCIONARIO.matriculaFuncionario = BDI.matriculaMotoristaBDI\n" +
+"INNER JOIN SERIED1 ON SERIED1.cod_registro = BDI.codRegistroD1\n" +
+"INNER JOIN SERIED9 ON SERIED9.cod_registro = BDI.codRegistroD9\n" +
+"INNER JOIN FRETE ON FRETE.codFrete = BDI.codFrete\n" +
+"WHERE BDI.codBDI = ? and horarios_por_linha.cod_linha = BDI.cod_linha\n" +
+"and horarios_por_linha.cod_horario = HORARIOS.cod_horario";
         
         try {
-            pst = conexao.prepareStatement(sql);
-            pst.setString(1, txtNumBDI.getText());
-            rs2 = pst.executeQuery();
+            pstConsultaBDI = conexao.prepareStatement(sqlConsultaBDI);
+            pstConsultaBDI.setString(1, txtNumBDI.getText());
+            rs2 = pstConsultaBDI.executeQuery();
             if(rs2.next()){
                 SimpleDateFormat formatadorData = new SimpleDateFormat("dd-MM-yyyy");
                 calendarioBDI.setDate(formatadorData.parse(rs2.getString(2)));
-                
-                cboHorarioBDI.setSelectedItem(rs2.getString(3));
+                numBDIBuscado = txtNumBDI.getText();
+                System.out.println(rs2.getString(3));
                 cboPrefixoBDI.setSelectedItem(rs2.getString(4));
+                cboHorarioBDI.setSelectedItem(rs2.getString(3));
+                System.out.println(rs2.getString(4));
                 txtItinerarioBDI.setText(rs2.getString(5));
                 cboCobradorBDI.setSelectedItem(rs2.getString(6));
                 txtNomeCobradorBDI.setText(rs2.getString(7));
@@ -481,11 +550,15 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
                 txtEncerranteFrete.setText(rs2.getString(20));
                 txtValorFrete.setText(rs2.getString(21));
                 
-                //Salvo os códigos buscados
+                
+                //Salvo os códigos buscados dos talões e fretes
                 codigosBuscados.clear();
                 codigosBuscados.add(rs2.getString(10));
                 codigosBuscados.add(rs2.getString(14));
                 codigosBuscados.add(rs2.getString(18));
+                //Salvo os valores dos codigos do horario e da linha buscados
+                codigosBuscados.add(getCodigoHorario());
+                codigosBuscados.add(getCodigoLinha());
                 
                 /*Atualiza o valor mostrado no Total BDI com os valores lidos somados e formatados com vírgula
                 no lugar do ponto*/
@@ -549,11 +622,7 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         txtNomeMotoristaBDI = new javax.swing.JTextField();
         txtItinerarioBDI = new javax.swing.JTextField();
         cboHorarioBDI = new javax.swing.JComboBox<>();
-        jLabel10 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
@@ -566,25 +635,25 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         calendarioBDI = new com.toedter.calendar.JCalendar();
         txtNumBDI = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
-        jLabel24 = new javax.swing.JLabel();
         txtInicianteD1 = new javax.swing.JTextField();
         jLabel25 = new javax.swing.JLabel();
         txtEncerranteD1 = new javax.swing.JTextField();
         jLabel26 = new javax.swing.JLabel();
         txtInicianteD9 = new javax.swing.JTextField();
         txtEncerranteD9 = new javax.swing.JTextField();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jComboBox3 = new javax.swing.JComboBox<>();
         jLabel27 = new javax.swing.JLabel();
         txtValorD1 = new javax.swing.JTextField();
         txtValorD9 = new javax.swing.JTextField();
         txtInicianteFrete = new javax.swing.JTextField();
         txtEncerranteFrete = new javax.swing.JTextField();
         txtValorFrete = new javax.swing.JTextField();
-        jComboBox2 = new javax.swing.JComboBox<>();
         jLabel4 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
         lblTotalBDI = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
         btnLimparFormBDI = new javax.swing.JButton();
         btnPesquisarBDI = new javax.swing.JButton();
         btnAlterarBDI = new javax.swing.JButton();
@@ -592,6 +661,10 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         btnSalvarBDI = new javax.swing.JButton();
 
         setClosable(true);
+        setTitle("Cadastrar B.D.I");
+        setMaximumSize(new java.awt.Dimension(836, 497));
+        setMinimumSize(new java.awt.Dimension(836, 497));
+        setPreferredSize(new java.awt.Dimension(836, 497));
 
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel1.setPreferredSize(new java.awt.Dimension(940, 220));
@@ -605,6 +678,11 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         txtNomeMotoristaBDI.setEditable(false);
 
         txtItinerarioBDI.setEditable(false);
+        txtItinerarioBDI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtItinerarioBDIActionPerformed(evt);
+            }
+        });
 
         cboHorarioBDI.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecione" }));
         cboHorarioBDI.addActionListener(new java.awt.event.ActionListener() {
@@ -613,15 +691,7 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
             }
         });
 
-        jLabel10.setText("-");
-
         jLabel20.setText("Nº BDI");
-
-        jLabel11.setText("-");
-
-        jLabel12.setText("-");
-
-        jLabel13.setText("-");
 
         jLabel6.setText("Cobrador");
 
@@ -686,99 +756,80 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(jLabel20, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(cboMotoristaBDI, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(cboCobradorBDI, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtNumBDI))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel13)
+                                .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtNumBDI, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jLabel11))
-                                    .addComponent(jLabel12))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(cboCobradorBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(cboMotoristaBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel8)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(cboPrefixoBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(12, 12, 12)
+                                        .addGap(24, 24, 24)
+                                        .addComponent(cboPrefixoBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(txtNomeCobradorBDI, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                         .addComponent(txtItinerarioBDI, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(cboHorarioBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(txtNomeCobradorBDI)
                                     .addComponent(txtNomeMotoristaBDI))))
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(calendarioBDI, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(97, 97, 97)
-                        .addComponent(jLabel15)
-                        .addGap(111, 111, 111))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel15))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(38, 38, 38)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel20)
+                            .addComponent(txtNumBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel15)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel20)
-                                        .addComponent(txtNumBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel10)
-                                        .addComponent(jLabel8)
-                                        .addComponent(txtItinerarioBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(cboPrefixoBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel19)
-                                        .addComponent(cboHorarioBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel8)
+                                    .addComponent(cboPrefixoBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel19)
+                                    .addComponent(cboHorarioBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtItinerarioBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabel6)
-                                    .addComponent(txtNomeCobradorBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel11)
-                                    .addComponent(cboCobradorBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(cboCobradorBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtNomeCobradorBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabel7)
-                                    .addComponent(txtNomeMotoristaBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel12)
-                                    .addComponent(cboMotoristaBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel13))
-                            .addComponent(jLabel15))
-                        .addContainerGap(23, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(calendarioBDI, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(28, 28, 28))))
+                                    .addComponent(cboMotoristaBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtNomeMotoristaBDI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addComponent(calendarioBDI, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 37, Short.MAX_VALUE))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Bilhetes", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18))); // NOI18N
         jPanel2.setMaximumSize(new java.awt.Dimension(928, 207));
         jPanel2.setMinimumSize(new java.awt.Dimension(928, 207));
-
-        jLabel24.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel24.setText("Série");
 
         txtInicianteD1.addCaretListener(new javax.swing.event.CaretListener() {
             public void caretUpdate(javax.swing.event.CaretEvent evt) {
@@ -849,10 +900,6 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
                 txtEncerranteD9KeyTyped(evt);
             }
         });
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "D - 1" }));
-
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "D - 9" }));
 
         jLabel27.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel27.setText("Valor acertado");
@@ -959,94 +1006,106 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
             }
         });
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "FRETE" }));
-
         jLabel4.setText("Valor Total");
 
         jLabel14.setText("R$");
 
         lblTotalBDI.setText("0,00");
 
+        jLabel5.setText("Série");
+
+        jLabel9.setText("D - 1");
+
+        jLabel10.setText("D - 9");
+
+        jLabel11.setText("FRETE");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(95, 95, 95)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jComboBox3, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel24, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jComboBox2, 0, 110, Short.MAX_VALUE))
-                .addGap(41, 41, 41)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtInicianteFrete)
-                    .addComponent(jLabel25, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
-                    .addComponent(txtInicianteD9)
-                    .addComponent(txtInicianteD1))
-                .addGap(78, 78, 78)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel26, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtEncerranteD9)
-                    .addComponent(txtEncerranteD1)
-                    .addComponent(txtEncerranteFrete, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE))
-                .addGap(84, 84, 84)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtValorD9)
-                    .addComponent(txtValorD1)
-                    .addComponent(jLabel27, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtValorFrete, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE))
-                .addGap(26, 26, 26)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGap(141, 141, 141)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel14)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblTotalBDI, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jLabel5)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel27, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(txtInicianteFrete, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtEncerranteFrete, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtValorFrete, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(txtInicianteD9, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtEncerranteD9, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtValorD9, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(txtInicianteD1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtEncerranteD1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtValorD1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(41, 41, 41)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel14)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblTotalBDI, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(31, 31, 31)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel25)
+                    .addComponent(jLabel26)
+                    .addComponent(jLabel27)
+                    .addComponent(jLabel5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel27)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtInicianteD1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtEncerranteD1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtValorD1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel9))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtValorD1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtInicianteD9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtEncerranteD9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtValorD9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel10)))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(12, 12, 12)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel14)
-                            .addComponent(lblTotalBDI))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtValorD9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel26)
-                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabel24)
-                                .addComponent(jLabel25)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtEncerranteD1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtInicianteD1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtEncerranteD9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(txtInicianteD9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addGap(18, 18, 18)
+                            .addComponent(lblTotalBDI))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtInicianteFrete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtInicianteFrete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(txtEncerranteFrete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(txtValorFrete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(23, Short.MAX_VALUE))
+                    .addComponent(jLabel11))
+                .addGap(75, 75, 75))
         );
 
         btnLimparFormBDI.setIcon(new javax.swing.ImageIcon(getClass().getResource("/BDI/Digital/Icones/if_CCleaner_33788.png"))); // NOI18N
@@ -1110,7 +1169,7 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnSalvarBDI, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1120,18 +1179,21 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnDeletarBDI, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnLimparFormBDI, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 928, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(btnLimparFormBDI, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 536, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 800, Short.MAX_VALUE)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(18, 18, 18)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(25, 25, 25)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(btnSalvarBDI)
@@ -1140,10 +1202,10 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
                         .addComponent(btnPesquisarBDI)
                         .addComponent(btnDeletarBDI)
                         .addComponent(btnLimparFormBDI)))
-                .addContainerGap(35, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        pack();
+        setBounds(0, 0, 836, 497);
     }// </editor-fold>//GEN-END:initComponents
 
     private void cboHorarioBDIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboHorarioBDIActionPerformed
@@ -1665,6 +1727,7 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
                 alterarTaloesD1();
                 alterarTaloesD9();
                 alterarFretes();
+                alteraBDI();
                 JOptionPane.showMessageDialog(null, "BDI Nº " + txtNumBDI.getText() + " atualizado com sucesso!");
             }
             else{ //Mensagem de erro caso os campos não estejam devidamente preenchidos
@@ -1696,6 +1759,10 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_btnSalvarBDIActionPerformed
 
+    private void txtItinerarioBDIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtItinerarioBDIActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtItinerarioBDIActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAlterarBDI;
@@ -1708,28 +1775,24 @@ public class TelaCadastraBDI extends javax.swing.JInternalFrame {
     private javax.swing.JComboBox<String> cboHorarioBDI;
     public static javax.swing.JComboBox<String> cboMotoristaBDI;
     public static javax.swing.JComboBox<String> cboPrefixoBDI;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
-    private javax.swing.JComboBox<String> jComboBox3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblTotalBDI;

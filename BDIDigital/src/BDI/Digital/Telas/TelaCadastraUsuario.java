@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JOptionPane;
 import BDI.Digital.DAL.ModuloConexao;
+import java.awt.Dimension;
 
 /**
  *
@@ -36,6 +37,12 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
         btnPesquisarUsu.setEnabled(false);
         btnAlterarUsu.setEnabled(false);
         btnDeletarUsu.setEnabled(false);
+        lblMsgAlterarSenha.setVisible(false);
+    }
+    
+    public void setPosicao(){
+        Dimension d = this.getDesktopPane().getSize();
+        this.setLocation((d.width - this.getSize().width) / 2, (d.height - this.getSize().height) / 2); 
     }
     
     private void limparTela(){
@@ -50,6 +57,7 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
         btnPesquisarUsu.setEnabled(false);
         btnAlterarUsu.setEnabled(false);
         btnDeletarUsu.setEnabled(false);
+        lblMsgAlterarSenha.setVisible(false);
     }
     
     private boolean validaCampos(String modo){
@@ -128,11 +136,11 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
             
             try {
                 pst = conexao.prepareStatement(sql);
-                pst.setString(1, txtUsuMatricula.getText());
-                pst.setString(2, txtUsuNome.getText());
-                pst.setString(3, txtUsuTelefone.getText());
-                pst.setString(4, txtUsuLogin.getText());
-                pst.setString(5, txtUsuSenha.getText());
+                pst.setString(1, txtUsuMatricula.getText().toUpperCase());
+                pst.setString(2, txtUsuNome.getText().toUpperCase());
+                pst.setString(3, txtUsuTelefone.getText().toUpperCase());
+                pst.setString(4, txtUsuLogin.getText().toUpperCase());
+                pst.setString(5, txtUsuSenha.getText().toUpperCase());
                 //A linha abaixo atualiza a tabela usuario com os dados do formulário
                 pst.executeUpdate();
                 JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso!");
@@ -250,15 +258,13 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
         btnDeletarUsu = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         txtUsuTelefone = new javax.swing.JTextField();
+        lblMsgAlterarSenha = new javax.swing.JLabel();
 
         setClosable(true);
-        setIconifiable(true);
-        setMaximizable(true);
-        setResizable(true);
         setTitle("Cadastrar Usuário");
-        setMaximumSize(new java.awt.Dimension(948, 579));
-        setMinimumSize(new java.awt.Dimension(948, 579));
-        setPreferredSize(new java.awt.Dimension(948, 579));
+        setMaximumSize(new java.awt.Dimension(577, 400));
+        setMinimumSize(new java.awt.Dimension(577, 400));
+        setPreferredSize(new java.awt.Dimension(577, 400));
 
         txtUsuLogin.addCaretListener(new javax.swing.event.CaretListener() {
             public void caretUpdate(javax.swing.event.CaretEvent evt) {
@@ -380,47 +386,54 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
             }
         });
 
+        lblMsgAlterarSenha.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        lblMsgAlterarSenha.setText("*Deixe o campo senha em branco para manter a senha atual.");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGap(142, 142, 142)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addGap(142, 142, 142)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabel1)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(txtUsuMatricula, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
+                                .addComponent(txtUsuNome)
+                                .addComponent(txtUsuTelefone)))
+                        .addGroup(layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(txtUsuLogin)
+                                .addComponent(txtUsuSenha, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(143, 143, 143)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jLabel3))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(btnCadastrarUsu, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnPesquisarUsu, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnAlterarUsu, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(56, 56, 56))
+                                    .addComponent(btnDeletarUsu, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtUsuMatricula, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
-                                    .addComponent(txtUsuNome)
-                                    .addComponent(txtUsuTelefone)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(19, 19, 19)
-                                .addComponent(btnCadastrarUsu, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnPesquisarUsu, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnAlterarUsu, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnDeletarUsu, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btnLimparFormUsu, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel4))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtUsuLogin)
-                                    .addComponent(txtUsuSenha, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE))))))
-                .addContainerGap(528, Short.MAX_VALUE))
+                                .addComponent(btnLimparFormUsu, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblMsgAlterarSenha))))
+                .addContainerGap(72, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -445,18 +458,21 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(txtUsuSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblMsgAlterarSenha)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnCadastrarUsu)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(btnAlterarUsu)
-                        .addComponent(btnPesquisarUsu)
-                        .addComponent(btnDeletarUsu)
-                        .addComponent(btnLimparFormUsu)))
-                .addContainerGap(292, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(btnCadastrarUsu)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnAlterarUsu)
+                            .addComponent(btnPesquisarUsu)))
+                    .addComponent(btnDeletarUsu)
+                    .addComponent(btnLimparFormUsu))
+                .addContainerGap(93, Short.MAX_VALUE))
         );
 
-        setBounds(0, 0, 963, 579);
+        setBounds(0, 0, 577, 400);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCadastrarUsuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarUsuActionPerformed
@@ -476,6 +492,8 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
     private void btnPesquisarUsuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesquisarUsuActionPerformed
         // TODO add your handling code here:
         consultar();
+        lblMsgAlterarSenha.setVisible(true);
+        txtUsuSenha.setText(null);
     }//GEN-LAST:event_btnPesquisarUsuActionPerformed
 
     private void btnAlterarUsuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAlterarUsuActionPerformed
@@ -677,6 +695,7 @@ public class TelaCadastraUsuario extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel lblMsgAlterarSenha;
     private javax.swing.JTextField txtUsuLogin;
     public static javax.swing.JTextField txtUsuMatricula;
     private javax.swing.JTextField txtUsuNome;
